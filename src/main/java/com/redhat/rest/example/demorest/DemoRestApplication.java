@@ -38,15 +38,7 @@ public class DemoRestApplication {
 						"ComplaintsManagementWorkflow/instances?bridgeEndpoint=true" +
 						"&host=agentlogin:Lost2018@localhost:8080")
 				;
-
-				CaseData caseData = new CaseData();
-				caseData.setCustomerName("john");
-				caseData.setCustomerAddress("john@gml.com");
-				caseData.setCustomerPhone("998-998-9980");
-				caseData.setCategory("Mortgages");
-				caseData.setBusinessUnit("Mortgages");
-				caseData.setComplaintsDescription("Incorrect Monthly payment debit");
-
+				
 
 				rest("/businessCentral").post().type(CaseData.class).
 						to("rest:post:/kie-server/services/rest/server/containers/ComplaintsManagementSystem_1.0.0/cases/" +
