@@ -21,7 +21,6 @@ public class DemoRestApplication {
 	}
 
 
-
 	@Bean
 	public RouteBuilder routeBuilder() {
 		return new RouteBuilder() {
@@ -36,14 +35,15 @@ public class DemoRestApplication {
 						to(
 				"rest:get:/kie-server/services/rest/server/containers/ComplaintsManagementSystem_1.0.0/cases/" +
 						"ComplaintsManagementWorkflow/instances?bridgeEndpoint=true" +
-						"&host=agentlogin:Lost2018@localhost:8080")
-				;
-				
-
-				rest("/businessCentral").post().type(CaseData.class).
-						to("rest:post:/kie-server/services/rest/server/containers/ComplaintsManagementSystem_1.0.0/cases/" +
-				"ComplaintsManagementWorkflow/instances?bridgeEndpoint=true" +
 						"&host=agentlogin:Lost2018@localhost:8080");
+
+
+				rest("/businessCentral").post()
+						.type(CaseData.class)
+						.route()
+						.removeHeaders("*") 
+						.to("rest:post:/kie-server/services/rest/server/containers/ComplaintsManagementSystem_1.0.0/cases/" +
+								"ComplaintsManagementWorkflow/instances?host=agentlogin:Lost2018@localhost:8080&produces=application/json").endRest();
 
 
 

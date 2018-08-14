@@ -10,6 +10,27 @@ public class CaseData {
     private String businessUnit;
     private String complaintsDescription;
 
+    public CaseData(String customerName, String customerAddress, String customerPhone, String category, String businessUnit, String complaintsDescription) {
+        this.customerName = customerName;
+        this.customerAddress = customerAddress;
+        this.customerPhone = customerPhone;
+        this.category = category;
+        this.businessUnit = businessUnit;
+        this.complaintsDescription = complaintsDescription;
+    }
+
+    @Override
+    public String toString() {
+        return "CaseData{" +
+                "customerName='" + customerName + '\'' +
+                ", customerAddress='" + customerAddress + '\'' +
+                ", customerPhone='" + customerPhone + '\'' +
+                ", category='" + category + '\'' +
+                ", businessUnit='" + businessUnit + '\'' +
+                ", complaintsDescription='" + complaintsDescription + '\'' +
+                '}';
+    }
+
     public String getCustomerName() {
         return customerName;
     }
