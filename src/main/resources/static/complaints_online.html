@@ -1,0 +1,119 @@
+<!DOCTYPE HTML>
+<html>
+
+
+<head>
+
+  <meta name="description" content="website description" />
+  <meta name="keywords" content="website keywords, website keywords" />
+  <meta http-equiv="content-type" content="text/html; charset=windows-1252" />
+  <link rel="stylesheet" type="text/css" href="style/style.css" />
+  <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+
+
+<script>
+var app = angular.module('myApp', []);
+app.controller('FormController', function($scope,$http) {
+$scope.createComplaint = function() {
+
+
+$http({
+        url: 'http://localhost:8090/camel/businessCentral',
+        method: "POST",
+        data: {
+    'case-data': {
+    'customerName': 'john',
+    'customerAddress': 'sadhana.nandakumar@gmail.com'
+  }
+},
+        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+    })
+    .then(function(response) {
+            // success
+    },
+    function(response) { // optional
+            // failed
+    });
+
+
+var caseDataParsed = JSON.parse(JSON.stringify($scope.caseData));
+
+return $http.post ('http://localhost:8090/camel/businessCentral', caseDataParsed)
+
+}
+});
+
+
+ </script>
+</head>
+
+<body>
+  <div id="main">
+    <div id="header">
+      <div id="logo">
+        <div id="logo_text">
+          <!-- class="logo_colour", allows you to change the colour of the text -->
+          <h1><a href="index.html"><span class="logo_colour">Acme Financial</span></a></h1>
+          <h2>Complaints</h2>
+        </div>
+      </div>
+      <div id="menubar">
+        <ul id="menu">
+          <!-- put class="selected" in the li tag for the selected page - to highlight which page you're on -->
+          <li class="selected"><a href="complaints_online.html">Complaints</a></li>
+        </ul>
+      </div>
+    </div>
+    <div id="content_header"></div>
+    <div id="site_content">
+      <div id="sidebar_container">
+        <div class="sidebar">
+          <div class="sidebar_top"></div>
+          <div class="sidebar_item">
+            <!-- insert your sidebar items here -->
+            <h3>By Phone</h3>
+            <p>Calling is one of the fastest ways to talk to us about your complaint. <br/>
+              Lines are open 24 hours a day, 7 days a week<br/>
+              <b>999-99-9999</b>
+              </p>
+            <br/>
+            <h3>By Mail</h3>
+            <p>You can also send in your complaints over mail<br/>
+              <b>PO BOX 9999</b>
+            </p>
+
+          </div>
+          <div class="sidebar_base"></div>
+        </div>
+
+      </div>
+      <div id="content" ng-app="myApp" ng-controller="FormController">
+
+        <form  >
+        <!-- insert the page content here -->
+        <h1>How do I make a complaint?</h1>
+        <p>We’re sorry that you’re not happy with our service. By making a complaint, you’re giving us the opportunity to investigate and improve our services for everybody.</p>
+          <div class="form_settings">
+            <p><span>Name</span><input class="contact" type="text" ng-model="caseData.customerName"/></p>
+            <p><span>Email Address</span><input class="contact" type="text" ng-model="caseData.customerAddress" /></p>
+            <p><span>Phone Number</span><input class="contact" type="text" ng-model="caseData.customerPhone" /></p>
+
+            <p><span>Complaints Description</span><textarea class="contact textarea" rows="8" cols="50" ng-model="caseData.complaintsDescription"></textarea></p>
+            <p><span>Policy Nos, Account Nos., Referecences</span><input class="contact" type="text"   /></p>
+            <p style="padding-top: 15px"><span>&nbsp;</span><input class="submit" type="submit" ng-click="createComplaint()"/></p>
+          </div>       
+        <p><br /><br />NOTE: Once you’ve made a complaint, we'll aim to contact you within 24 hours.We aim to deal with complaints as quickly as possible, this will usually be 15 days, and no longer than 8 weeks. We’ll keep you updated on our progress.</p>
+        </form>
+
+
+
+      </div>
+
+    </div>
+    <div id="content_footer"></div>
+    <div id="footer">
+      <p><a>Home</a> | <a>Account</a> | <a>Help</a> | <a >About</a> | <a>Contact Us</a></p>
+      </div>
+  </div>
+</body>
+</html>

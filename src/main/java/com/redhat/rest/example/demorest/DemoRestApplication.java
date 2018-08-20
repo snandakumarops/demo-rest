@@ -33,15 +33,16 @@ public class DemoRestApplication {
 
 				rest("/businessCentral").get().
 						to(
-				"rest:get:/kie-server/services/rest/server/containers/ComplaintsManagementSystem_1.0.0/cases/" +
+				"rest:get:/kie-server/services/rest/server/containers/ComplaintsManagementSystem/cases/" +
 						"ComplaintsManagementWorkflow/instances?bridgeEndpoint=true" +
 						"&host=agentlogin:Lost2018@localhost:8080");
+
 
 
 				rest("/businessCentral").post()
 						.type(CaseData.class)
 						.route()
-						.removeHeaders("*") 
+						.removeHeaders("*") // strip all headers (for this example) so that the received message HTTP headers do not confuse the REST producer when POSTing
 						.to("rest:post:/kie-server/services/rest/server/containers/ComplaintsManagementSystem_1.0.0/cases/" +
 								"ComplaintsManagementWorkflow/instances?host=agentlogin:Lost2018@localhost:8080&produces=application/json").endRest();
 
