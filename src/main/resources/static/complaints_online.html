@@ -20,12 +20,8 @@ $scope.createComplaint = function() {
 $http({
         url: 'http://localhost:8090/camel/businessCentral',
         method: "POST",
-        data: {
-    'case-data': {
-    'customerName': 'john',
-    'customerAddress': 'sadhana.nandakumar@gmail.com'
-  }
-},
+        data: $scope.caseData
+        ,
         headers: {'Content-Type': 'application/x-www-form-urlencoded'}
     })
     .then(function(response) {
@@ -36,9 +32,6 @@ $http({
     });
 
 
-var caseDataParsed = JSON.parse(JSON.stringify($scope.caseData));
-
-return $http.post ('http://localhost:8090/camel/businessCentral', caseDataParsed)
 
 }
 });
