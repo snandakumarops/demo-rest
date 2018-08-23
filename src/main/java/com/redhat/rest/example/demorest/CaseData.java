@@ -9,14 +9,38 @@ public class CaseData {
     private String category;
     private String businessUnit;
     private String complaintsDescription;
+    private String caseId;
+    private String customerAccNo;
 
-    public CaseData(String customerName, String customerAddress, String customerPhone, String category, String businessUnit, String complaintsDescription) {
+    public CaseData() {
+
+    }
+
+    public CaseData(String customerName, String customerAddress, String customerPhone, String category, String businessUnit, String complaintsDescription, String caseId, String customerAccNo) {
         this.customerName = customerName;
         this.customerAddress = customerAddress;
         this.customerPhone = customerPhone;
         this.category = category;
         this.businessUnit = businessUnit;
         this.complaintsDescription = complaintsDescription;
+        this.caseId = caseId;
+        this.customerAccNo = customerAccNo;
+    }
+
+    public String getCustomerAccNo() {
+        return customerAccNo;
+    }
+
+    public void setCustomerAccNo(String customerAccNo) {
+        this.customerAccNo = customerAccNo;
+    }
+
+    public String getCaseId() {
+        return caseId;
+    }
+
+    public void setCaseId(String caseId) {
+        this.caseId = caseId;
     }
 
     @Override

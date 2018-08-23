@@ -12,23 +12,26 @@
 
 
 <script>
+
 var app = angular.module('myApp', []);
 app.controller('FormController', function($scope,$http) {
 $scope.createComplaint = function() {
 
 
 $http({
-        url: 'http://localhost:8090/camel/businessCentral',
+        url: 'http://localhost:8090/camel/complaints/online',
         method: "POST",
-        data: $scope.caseData
-        ,
-        headers: {'Content-Type': 'application/x-www-form-urlencoded'}
+        data:$scope.caseData,
+
     })
     .then(function(response) {
             // success
+            console.log (JSON.stringify (response, null, 2));
+
     },
     function(response) { // optional
             // failed
+            console.log (JSON.stringify (response, null, 2));
     });
 
 
@@ -87,6 +90,7 @@ $http({
         <h1>How do I make a complaint?</h1>
         <p>We’re sorry that you’re not happy with our service. By making a complaint, you’re giving us the opportunity to investigate and improve our services for everybody.</p>
           <div class="form_settings">
+            <p><span>Case Created, Please retain reference no for future communication</span><input type="hidden" type="text" ng-model="caseData.caseId"/></p>
             <p><span>Name</span><input class="contact" type="text" ng-model="caseData.customerName"/></p>
             <p><span>Email Address</span><input class="contact" type="text" ng-model="caseData.customerAddress" /></p>
             <p><span>Phone Number</span><input class="contact" type="text" ng-model="caseData.customerPhone" /></p>
