@@ -15,6 +15,7 @@
 
 var app = angular.module('myApp', []);
 app.controller('FormController', function($scope,$http) {
+$scope.returnData = {};
 $scope.createComplaint = function() {
 
 
@@ -27,6 +28,8 @@ $http({
     .then(function(response) {
             // success
             console.log (JSON.stringify (response, null, 2));
+            $scope.returnData.message  = 'Please retain case records for your future reference :'+ response.data;
+            $scope.caseData = null;
 
     },
     function(response) { // optional
@@ -86,17 +89,16 @@ $http({
       <div id="content" ng-app="myApp" ng-controller="FormController">
 
         <form  >
+        <h3 style="color:green">{{returnData.message}}</h3>
         <!-- insert the page content here -->
         <h1>How do I make a complaint?</h1>
         <p>We’re sorry that you’re not happy with our service. By making a complaint, you’re giving us the opportunity to investigate and improve our services for everybody.</p>
           <div class="form_settings">
-            <p><span>Case Created, Please retain reference no for future communication</span><input type="hidden" type="text" ng-model="caseData.caseId"/></p>
             <p><span>Name</span><input class="contact" type="text" ng-model="caseData.customerName"/></p>
             <p><span>Email Address</span><input class="contact" type="text" ng-model="caseData.customerAddress" /></p>
             <p><span>Phone Number</span><input class="contact" type="text" ng-model="caseData.customerPhone" /></p>
 
             <p><span>Complaints Description</span><textarea class="contact textarea" rows="8" cols="50" ng-model="caseData.complaintsDescription"></textarea></p>
-            <p><span>Policy Nos, Account Nos., Referecences</span><input class="contact" type="text"   /></p>
             <p style="padding-top: 15px"><span>&nbsp;</span><input class="submit" type="submit" ng-click="createComplaint()"/></p>
           </div>       
         <p><br /><br />NOTE: Once you’ve made a complaint, we'll aim to contact you within 24 hours.We aim to deal with complaints as quickly as possible, this will usually be 15 days, and no longer than 8 weeks. We’ll keep you updated on our progress.</p>

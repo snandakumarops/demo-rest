@@ -4,12 +4,12 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.redhat.rest.example</groupId>
-	<artifactId>demo-rest</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<artifactId>complaints-management</artifactId>
+	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
-	<name>demo-rest</name>
-	<description>Demo project for Spring Boot</description>
+	<name>complaints-management</name>
+	<description>Handles omni channel complaints management experience</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>

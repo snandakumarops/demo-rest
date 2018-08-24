@@ -19,22 +19,23 @@ public class TransformerBean {
     private CustomerDetails customerDetails;
 
 
-
-
+    private static final String CASE_USER_ASSIGNMENT="\"case-user-assignments\" : { \"admin\" : \"pamAdmin\" }}";
 
     public String transformOnlineResponse(String reqJson) {
-        Map<String,String> categorization = calculateCategoryBusinessUnit(reqJson);
+        Map<String,String> categoryMap = calculateCategoryBusinessUnit(reqJson);
         String rawJson = StringUtils.chop(reqJson);
-        String returnString = null;
-        for(String key:categorization.keySet()) {
-            returnString = "{\"case-data\" :  " + rawJson + ",\"category\":\"" + key + "\",\"businessUnit\":\""+ categorization.get(key)
-                    + "\"} ," +
-                    "\"case-user-assignments\" : {\n" +
-                    "  \t\"admin\" : \"pamAdmin\"\n" +
-                    "  } }";
-            System.out.println("retString" + returnString);
+        StringBuilder returnString = new StringBuilder();
+        for(String key:categoryMap.keySet()) {
+            returnString.append("{\"case-data\" :  " )
+                        .append(rawJson)
+                        .append(",\"category\":\"")
+                        .append(key).append("\",\"businessUnit\":\"")
+                        .append(categoryMap.get(key))
+                        .append("\"} ,")
+                        .append(CASE_USER_ASSIGNMENT);
+
         }
-        return returnString;
+        return returnString.toString();
     }
 
     public Map<String,String> calculateCategoryBusinessUnit(String reqJson) {
@@ -42,27 +43,22 @@ public class TransformerBean {
         String category = "Other";
         String businessUnit = "OtherBU";
         String complaintsDescription = StringUtils.substringBetween(reqJson,"complaintsDescription\":\"","\"}");
-        System.out.print("complaintsDescription"+complaintsDescription);
 
         Map<String,String> properties = categorization.getMapProperty();
-
-        System.out.print(properties.keySet().toString());
-
 
         for(String key:properties.keySet()) {
             List<String> list = Arrays.asList(properties.get(key).split(","));
             boolean match = list.stream().anyMatch(s -> complaintsDescription.contains(s));
-            System.out.println(match);
+
             if(match) {
                 category = key;
                 businessUnit = key + "BU";
             }
         }
 
-
         Map<String,String> categoryBusinessUnit = new HashMap<>();
         categoryBusinessUnit.put(category,businessUnit);
-        System.out.println(categoryBusinessUnit.toString());
+
         return categoryBusinessUnit;
 
 
@@ -72,31 +68,52 @@ public class TransformerBean {
         String businessUnit = StringUtils.substringBetween(reqJson,"category\":\"","\",")+"BU";
         String rawJson = StringUtils.chop(reqJson);
         rawJson= rawJson + ",\""+lookUpUserDetails(StringUtils.substringBetween(reqJson,"customerAccNo\":\"","\","));
-        String returnString = null;
+        StringBuilder returnString = new StringBuilder();
 
-        returnString = "{\"case-data\" :  " + rawJson + ",\"businessUnit\":\""+ businessUnit
-                    + "\"} ," +
-                    "\"case-user-assignments\" : {\n" +
-                    "  \t\"admin\" : \"pamAdmin\"\n" +
-                    "  } }";
-        System.out.println("retString" + returnString);
+        returnString.append("{\"case-data\" :  ")
+                    .append(rawJson)
+                    .append(",\"businessUnit\":\"")
+                    .append(businessUnit)
+                    .append("\"} ,")
+                    .append(CASE_USER_ASSIGNMENT);
 
-        return returnString;
+
+        return returnString.toString();
     }
 
     public String lookUpUserDetails(String customerNumber) {
-        String returnString = "";
+        StringBuilder returnString = new StringBuilder();
         //logic to pull customer details based on customer Number
         if(customerDetails.getCustomerNo().equals(customerNumber)) {
            String[] customerDet= customerDetails.getCustDetails().split(",");
-           returnString+="customerName\":\""+customerDet[0] +
-                   "\",\"customerPhone\":\""+customerDet[1] +
-                   "\",\"customerAddress\":\""+customerDet[2]+"\"";
+           returnString.append("customerName\":\"")
+                       .append(customerDet[0])
+                       .append("\",\"customerPhone\":\""+customerDet[1])
+                       .append("\",\"customerAddress\":\""+customerDet[2]+"\"");
         }
-        System.out.println(returnString+"+++");
-        return returnString;
+
+        return returnString.toString();
 
     }
+
+    public String transformExcelResponse(String reqJson) {
+
+        String rawJson = StringUtils.chop(reqJson);
+        StringBuilder returnString = new StringBuilder();
+        returnString.append("{\"case-data\" :  {")
+                    .append("\"customerName\":\"" + StringUtils.substringBetween(rawJson, "customerName='", "'"))
+                    .append("\",\"customerPhone\":\"" + StringUtils.substringBetween(rawJson, "customerPhone='", "'"))
+                    .append("\",\"customerAddress\":\"" + StringUtils.substringBetween(rawJson, "customerAddress='", "'"))
+                    .append("\",\"category\":\"" + StringUtils.substringBetween(rawJson, "category='", "'"))
+                    .append("\",\"businessUnit\":\"" + StringUtils.substringBetween(rawJson, "businessUnit='", "'") + "\"" + " },")
+                    .append(CASE_USER_ASSIGNMENT);
+
+
+        return returnString.toString();
+
+    }
+
+
 
 
 

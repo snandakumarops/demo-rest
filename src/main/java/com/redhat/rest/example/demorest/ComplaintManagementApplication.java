@@ -1,8 +1,5 @@
 package com.redhat.rest.example.demorest;
 
-import org.apache.camel.Exchange;
-import org.apache.camel.Processor;
-import org.apache.camel.ProducerTemplate;
 import org.apache.camel.builder.RouteBuilder;
 import org.apache.camel.model.rest.RestBindingMode;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,16 +8,13 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.io.FileInputStream;
-import java.io.InputStream;
-
 @SpringBootApplication
 @RestController
-public class DemoRestApplication {
+public class ComplaintManagementApplication {
 
 	public static void main(String[] args) {
 
-		SpringApplication.run(DemoRestApplication.class, args);
+		SpringApplication.run(ComplaintManagementApplication.class, args);
 	}
 
 	@Value("${businessCentralUserName}")
@@ -32,6 +26,7 @@ public class DemoRestApplication {
 	@Value("${businessCentralUrl}")
 	private String businessCentralUrl;
 
+	public static final String BODY = "${body}";
 
 
 	@Bean
@@ -50,7 +45,6 @@ public class DemoRestApplication {
 						host +
 						"&produces=application/json";
 
-				System.out.println("start case::::::"+startCase);
 
 				restConfiguration()
 						.component("servlet")
@@ -63,29 +57,31 @@ public class DemoRestApplication {
 						"ComplaintsManagementWorkflow/instances?bridgeEndpoint=true&" +
 						host);
 
-
-				//start case in Case Manager
+				//start case from the online banking website
 				rest("/complaints/online").post()
 						.type(CaseData.class).enableCORS(true)
-						.route().log("${body}")
+						.route().log(BODY)
 						.removeHeaders("*") // strip all headers (for this example) so that the received message HTTP headers do not confuse the REST producer when POSTing
 						.bean(TransformerBean.class,"transformOnlineResponse")
 						.to(startCase).endRest();
 
-				//start case in Case Manager
+				//start case from the branch banking website
 				rest("/complaints/branch").post()
 						.type(CaseData.class).enableCORS(true)
-						.route().log("${body}")
+						.route().log(BODY)
 						.removeHeaders("*") // strip all headers (for this example) so that the received message HTTP headers do not confuse the REST producer when POSTing
 						.bean(TransformerBean.class,"transformBranchBanking")
 						.to(startCase).endRest();
 
-				//Batch Processing Mode
 
-				ProducerTemplate template = this.getContext().createProducerTemplate();
-				InputStream orderxml = new FileInputStream("src/main/resources/order.xml");
+				//Batch Processing Mode - start cases from excel (scenario for By Phone and By POST)
+				from("file:/Users/sadhananandakumar/Documents/Demos/test").
+						bean(ExcelConverterBean.class,"process").log(BODY).
+						split(bodyAs(String.class).tokenize("CaseData")).log(BODY).choice()
+						.when(simple("${property.CamelSplitIndex} > 0")).
+						bean(TransformerBean.class,"transformExcelResponse").to(startCase).otherwise().end();
 
-				
+
 
 			}
 		};

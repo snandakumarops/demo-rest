@@ -13,18 +13,7 @@ public class CaseData {
     private String customerAccNo;
 
     public CaseData() {
-
-    }
-
-    public CaseData(String customerName, String customerAddress, String customerPhone, String category, String businessUnit, String complaintsDescription, String caseId, String customerAccNo) {
-        this.customerName = customerName;
-        this.customerAddress = customerAddress;
-        this.customerPhone = customerPhone;
-        this.category = category;
-        this.businessUnit = businessUnit;
-        this.complaintsDescription = complaintsDescription;
-        this.caseId = caseId;
-        this.customerAccNo = customerAccNo;
+        super();
     }
 
     public String getCustomerAccNo() {
