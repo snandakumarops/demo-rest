@@ -22,7 +22,10 @@ public class TransformerBean {
     private static final String CASE_USER_ASSIGNMENT="\"case-user-assignments\" : { \"admin\" : \"pamAdmin\" }}";
 
     public String transformOnlineResponse(String reqJson) {
-        Map<String,String> categoryMap = calculateCategoryBusinessUnit(reqJson);
+
+        String complaintsDescription = StringUtils.substringBetween(reqJson,"complaintsDescription\":\"","\"}");
+
+        Map<String,String> categoryMap = calculateCategoryBusinessUnit(complaintsDescription);
         String rawJson = StringUtils.chop(reqJson);
         StringBuilder returnString = new StringBuilder();
         for(String key:categoryMap.keySet()) {
@@ -38,11 +41,11 @@ public class TransformerBean {
         return returnString.toString();
     }
 
-    public Map<String,String> calculateCategoryBusinessUnit(String reqJson) {
+    public Map<String,String> calculateCategoryBusinessUnit(String complaintsDescription) {
 
         String category = "Other";
         String businessUnit = "OtherBU";
-        String complaintsDescription = StringUtils.substringBetween(reqJson,"complaintsDescription\":\"","\"}");
+
 
         Map<String,String> properties = categorization.getMapProperty();
 
@@ -109,6 +112,27 @@ public class TransformerBean {
                     .append(CASE_USER_ASSIGNMENT);
 
 
+        return returnString.toString();
+
+    }
+
+    public String transformSOAPResponse(String reqJson) {
+
+        String rawJson = StringUtils.chop(reqJson);
+        StringBuilder returnString = new StringBuilder();
+        Map<String,String> categoryMap = calculateCategoryBusinessUnit(StringUtils.substringBetween(rawJson, "<complaintsDescription>", "</complaintsDescription>"));
+        for(String key:categoryMap.keySet()) {
+            returnString.append("{\"case-data\" :  {")
+                .append("\"customerName\":\"" + StringUtils.substringBetween(rawJson, "<customerName>", "</customerName>"))
+                .append("\",\"customerPhone\":\"" + StringUtils.substringBetween(rawJson, "<customerPhone>", "</customerPhone>"))
+                .append("\",\"customerAddress\":\"" + StringUtils.substringBetween(rawJson, "<customerAddress>", "</customerAddress>"))
+                .append("\",\"complaintsDescription\":\"" +StringUtils.substringBetween(rawJson,"<complaintsDescription>","</complaintsDescription"))
+                .append("\",\"category\":\"" + key)
+                .append("\",\"businessUnit\":\"" + categoryMap.get(key) + "\"" + " },")
+                .append(CASE_USER_ASSIGNMENT);
+
+        }
+        System.out.println("Route 5"+returnString);
         return returnString.toString();
 
     }
