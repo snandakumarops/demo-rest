@@ -85,6 +85,7 @@ public class TransformerBean {
     }
 
     public String lookUpUserDetails(String customerNumber) {
+        //Doing a dummy read from the properties file, this can be plugged to be a DB call.
         StringBuilder returnString = new StringBuilder();
         //logic to pull customer details based on customer Number
         if(customerDetails.getCustomerNo().equals(customerNumber)) {
@@ -93,6 +94,11 @@ public class TransformerBean {
                        .append(customerDet[0])
                        .append("\",\"customerPhone\":\""+customerDet[1])
                        .append("\",\"customerAddress\":\""+customerDet[2]+"\"");
+        } else {
+            returnString.append("customerName\":\"")
+                    .append("Default_Name")
+                    .append("\",\"customerPhone\":\""+"000-00-0000")
+                    .append("\",\"customerAddress\":\""+"Default_address"+"\"");
         }
 
         return returnString.toString();

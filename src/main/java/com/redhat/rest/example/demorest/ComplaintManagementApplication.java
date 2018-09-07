@@ -43,6 +43,9 @@ public class ComplaintManagementApplication {
 			@Override
 			public void configure() throws Exception {
 
+			String SOAPCallPayload = "<jav:inputSOATest xmlns:jav=\"http://javainuse.com\">\n" +
+					"         </jav:inputSOATest>";
+
 			String startCase = "rest:post:/kie-server/services/rest/server/containers/ComplaintsManagementSystem_1.0.0/cases/" +
 						"ComplaintsManagementWorkflow/instances?" +
 						host +
@@ -55,38 +58,55 @@ public class ComplaintManagementApplication {
 						.producerComponent("http4").host("localhost:8090");
 
 
-				rest("/businessCentral").get().
+				rest("/businessCentral").get().id("Get Case Information").
 						to(
 				"rest:get:/kie-server/services/rest/server/containers/ComplaintsManagementSystem/cases/" +
 						"ComplaintsManagementWorkflow/instances?bridgeEndpoint=true&" +
-						host);
+						host).id("Get Case Details from Business Central");
 
 				//start case from the online banking website
-				rest("/complaints/online").post()
+				rest("/complaints/online")
+						.post()
 						.type(CaseData.class).enableCORS(true)
-						.route().log(BODY)
-						.description("Start Case from Online Banking Flow")
+						.route().id("Complaints Management - Online Banking")
 						.removeHeaders("*") // strip all headers (for this example) so that the received message HTTP headers do not confuse the REST producer when POSTing
 						.bean(TransformerBean.class,"transformOnlineResponse")
-						.to(startCase).endRest();
+						.id("Enrich/Add Categorization")
+						.to(startCase).id("Start Case Management Case:Online")
+						.endRest();
 
 				//start case from the branch banking website
-				rest("/complaints/branch").post()
+				rest("/complaints/branch")
+						.post()
 						.type(CaseData.class).enableCORS(true)
-						.route().log(BODY)
-						.description("Start Case from Branch Banking Flow")
+						.route()
+						.id("Complaints Management - Branch Banking")
 						.removeHeaders("*") // strip all headers (for this example) so that the received message HTTP headers do not confuse the REST producer when POSTing
 						.bean(TransformerBean.class,"transformBranchBanking")
-						.to(startCase).endRest();
+						.id("Enrich/Add Customer Information")
+						.to(startCase).id("Start Case Management Case:Branch")
+						.endRest();
 
 
 				//Batch Processing Mode - start cases from excel (scenario for By Phone and By POST)
-				from("file:/Users/sadhananandakumar/Documents/Demos/test").
-						bean(ExcelConverterBean.class,"process").log(BODY).
-						description("Start Case for the Batch Flow").
-						split(bodyAs(String.class).tokenize("CaseData")).log(BODY).choice()
-						.when(simple("${property.CamelSplitIndex} > 0")).
-						bean(TransformerBean.class,"transformExcelResponse").to(startCase).otherwise().end();
+				from("file:/Users/sadhananandakumar/Documents/Demos/test")
+						.routeId("File Polling/Batch File Upload Mode")
+						.bean(ExcelConverterBean.class,"process")
+						.id("Parse Excel Data")
+						.split(bodyAs(String.class)
+						.tokenize("CaseData"))
+						.id("Split each case detail")
+						.choice()
+						.id("For every record from the excel bean")
+						.when(simple("${property.CamelSplitIndex} > 0"))
+						.id("case count > 0")
+						.bean(TransformerBean.class,"transformExcelResponse")
+						.id("Enrich Data from case Creation: Batch Mode")
+						.to(startCase)
+						.id("Start Case Management Case:File Mode")
+						.otherwise()
+						.id("End of File")
+						.end();
 
 
 
@@ -99,14 +119,16 @@ public class ComplaintManagementApplication {
 				cxfEndpoint.setCamelContext(this.getContext());
 
 
-				from("timer://foo?fixedRate=true&period=600000").
-						transform(simple("<jav:inputSOATest xmlns:jav=\"http://javainuse.com\">\n" +
-								"         </jav:inputSOATest>"))
-						.to(cxfEndpoint)
+				from("timer://regulatoryChannelTimer?fixedRate=true&period=600000")
+						.routeId("Regulatory Channel")
+						.transform(simple(SOAPCallPayload))
+						.id("Enrich Data for SOAP Call")
+						.to(cxfEndpoint).id("Call SOAP Channel")
 						.removeHeaders("*")
-						.description("Start case from the B2B flow")
 						.bean(TransformerBean.class,"transformSOAPResponse")
-						.log("${body}").to(startCase);
+						.id("Enrich Data from case Creation")
+						.to(startCase)
+						.id("Start Case Management Case:SOAP Channel");
 
 		}
 		};
