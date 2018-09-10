@@ -113,6 +113,7 @@ public class TransformerBean {
                     .append("\"customerName\":\"" + StringUtils.substringBetween(rawJson, "customerName='", "'"))
                     .append("\",\"customerPhone\":\"" + StringUtils.substringBetween(rawJson, "customerPhone='", "'"))
                     .append("\",\"customerAddress\":\"" + StringUtils.substringBetween(rawJson, "customerAddress='", "'"))
+                    .append("\",\"complaintsDescription\":\"" + StringUtils.substringBetween(rawJson, "complaintsDescription='", "'"))
                     .append("\",\"category\":\"" + StringUtils.substringBetween(rawJson, "category='", "'"))
                     .append("\",\"businessUnit\":\"" + StringUtils.substringBetween(rawJson, "businessUnit='", "'") + "\"" + " },")
                     .append(CASE_USER_ASSIGNMENT);

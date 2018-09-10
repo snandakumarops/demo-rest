@@ -29,6 +29,19 @@ public class ComplaintManagementApplication {
 	@Value("${businessCentralUrl}")
 	private String businessCentralUrl;
 
+	@Value("${fileLocation}")
+	private String fileLocation;
+
+	@Value("${soapEndPoint}")
+	private String soapEndPoint;
+
+	@Value("${soapWsdlURL}")
+	private String soapWsdlURL;
+
+	@Value("${soapOperation}")
+	private String soapOperation;
+
+
 	public static final String BODY = "${body}";
 
 
@@ -58,11 +71,7 @@ public class ComplaintManagementApplication {
 						.producerComponent("http4").host("localhost:8090");
 
 
-				rest("/businessCentral").get().id("Get Case Information").
-						to(
-				"rest:get:/kie-server/services/rest/server/containers/ComplaintsManagementSystem/cases/" +
-						"ComplaintsManagementWorkflow/instances?bridgeEndpoint=true&" +
-						host).id("Get Case Details from Business Central");
+
 
 				//start case from the online banking website
 				rest("/complaints/online")
@@ -89,8 +98,8 @@ public class ComplaintManagementApplication {
 
 
 				//Batch Processing Mode - start cases from excel (scenario for By Phone and By POST)
-				from("file:/Users/sadhananandakumar/Documents/Demos/test")
-						.routeId("File Polling/Batch File Upload Mode")
+				from("file:"+fileLocation)
+						.routeId("Complaints Management - File Polling/Batch File Upload Mode")
 						.bean(ExcelConverterBean.class,"process")
 						.id("Parse Excel Data")
 						.split(bodyAs(String.class)
@@ -112,15 +121,15 @@ public class ComplaintManagementApplication {
 
 				//SOAP Scenario
 				CxfEndpoint cxfEndpoint = new CxfEndpoint();
-				cxfEndpoint.setAddress("http://localhost:8070/javainuse/ws/complaints");
-				cxfEndpoint.setWsdlURL("http://localhost:8070/javainuse/ws/complaints.wsdl");
-				cxfEndpoint.setDefaultOperationName("SOATest");
+				cxfEndpoint.setAddress(soapEndPoint);
+				cxfEndpoint.setWsdlURL(soapWsdlURL);
+				cxfEndpoint.setDefaultOperationName(soapOperation);
 				cxfEndpoint.setDataFormat(DataFormat.PAYLOAD);
 				cxfEndpoint.setCamelContext(this.getContext());
 
 
 				from("timer://regulatoryChannelTimer?fixedRate=true&period=600000")
-						.routeId("Regulatory Channel")
+						.routeId("Complaints Management - Regulatory Channel")
 						.transform(simple(SOAPCallPayload))
 						.id("Enrich Data for SOAP Call")
 						.to(cxfEndpoint).id("Call SOAP Channel")
